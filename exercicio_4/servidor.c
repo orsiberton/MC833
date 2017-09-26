@@ -19,6 +19,12 @@ int main (int argc, char **argv) {
    char   buf[MAXDATASIZE];
    time_t ticks;
 
+   // verifica se a porta foi passado por parametro
+   if (argc != 2) {
+      perror("Porta nao informada!");
+      exit(1);
+   }
+
    // cria um socket TCP
    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
       perror("socket");
@@ -29,7 +35,7 @@ int main (int argc, char **argv) {
    bzero(&servaddr, sizeof(servaddr));
    servaddr.sin_family      = AF_INET;
    servaddr.sin_addr.s_addr = INADDR_ANY;
-   servaddr.sin_port        = htons(13000);
+   servaddr.sin_port        = htons(atoi(argv[1]));
 
    // faz o bind do socket TCP com o host:porta escolhidos
    if (bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == -1) {
@@ -58,6 +64,10 @@ int main (int argc, char **argv) {
       write(connfd, buf, strlen(buf));
 
       printf("Recebi uma conexão\n");
+
+      printf("Dormindo\n");
+      sleep(10);
+      printf("Acordando\n");
 
       // imprime dados do socket do cliente
       peeraddr_len = sizeof(struct sockaddr);

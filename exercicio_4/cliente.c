@@ -17,14 +17,10 @@ int main(int argc, char **argv) {
    char   recvline[MAXLINE + 1];
    char   error[MAXLINE + 1];
    struct sockaddr_in servaddr;
-   struct hostent *hp;
 
-   // verifica se o host foi passado como parametro
-   if (argc != 2) {
-      strcpy(error,"uso: ");
-      strcat(error,argv[0]);
-      strcat(error," <IPaddress>");
-      perror(error);
+   // verifica se o host e a porta foram passados
+   if (argc != 3) {
+      perror("Host/Porta nao informados!");
       exit(1);
    }
 
@@ -34,18 +30,11 @@ int main(int argc, char **argv) {
       exit(1);
    }
 
-   // recupera o IP através do host passado por parametro
-	 hp = gethostbyname(argv[1]);
-	 if (!hp) {
-		 fprintf(stderr, "simplex-talk: unknown host: %s\n", argv[1]);
-		 exit(1);
-	 }
-
    // configura os parâmetros da conexão
    bzero(&servaddr, sizeof(servaddr));
    servaddr.sin_family = AF_INET;
    servaddr.sin_addr.s_addr = inet_addr(argv[1]);
-   servaddr.sin_port   = htons(13000);
+   servaddr.sin_port   = htons(atoi(argv[2]));
 
    if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0) {
       perror("inet_pton error");

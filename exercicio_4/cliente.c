@@ -38,28 +38,42 @@ int main(int argc, char **argv) {
       exit(1);
    }
 
-   // le o que foi recebido através do socket e imprime o conteúdo
-   while ( (n = read(sockfd, recvline, MAXLINE)) > 0) {
-      recvline[n] = 0;
-      if (fputs(recvline, stdout) == EOF) {
-         perror("fputs error");
-         exit(1);
-      }
-   }
+   char* input;
+   do{
 
-   if (n < 0) {
-      perror("read error");
-      exit(1);
-   }
+	scanf("%s", input);
 
-   // imprime dados do socket
-   servaddr_len = sizeof(struct sockaddr_in);
-   if (getsockname(sockfd, (struct sockaddr *) &servaddr, &servaddr_len) == -1) {
-     perror("getsockname() failed");
-     return -1;
-   }
-   printf("IP address do socket: %s\n", inet_ntoa(servaddr.sin_addr));
-   printf("Client port do socket: %d\n", (int) ntohs(servaddr.sin_port));
+	write(sockfd, input, strlen(input));
+
+	// le o que foi recebido através do socket e imprime o conteúdo
+	if ( (n = read(sockfd, recvline, MAXLINE)) > 0) {
+		recvline[n] = 0;
+		if (fputs(recvline, stdout) == EOF) {
+			perror("fputs error");
+			exit(1);
+		}
+
+		printf("%s\n", recvline);
+	}
+
+	if (n < 0) {
+		perror("read error");
+		exit(1);
+	}
+
+	// imprime dados do socket
+	/*
+	servaddr_len = sizeof(struct sockaddr_in);
+	if (getsockname(sockfd, (struct sockaddr *) &servaddr, &servaddr_len) == -1) {
+		perror("getsockname() failed");
+		return -1;
+	}
+	printf("IP address do socket: %s\n", inet_ntoa(servaddr.sin_addr));
+	printf("Client port do socket: %d\n", (int) ntohs(servaddr.sin_port));
+	*/
+
+   } while(input != "X");
 
    exit(0);
 }
+

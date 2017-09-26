@@ -14,12 +14,6 @@ int main(int argc, char **argv) {
 
    // cria um socket TCP
    sockfd = Socket(AF_INET, SOCK_STREAM, 0);
-   /*
-   if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-      perror("socket error");
-      exit(1);
-   }
-   */
 
    // configura os parâmetros da conexão
    bzero(&servaddr, sizeof(servaddr));
@@ -76,4 +70,3 @@ int main(int argc, char **argv) {
 
    exit(0);
 }
-

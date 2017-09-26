@@ -1,17 +1,13 @@
-CC		= gcc
-FLAGS = -Wall
-APIS	= my_socket_api.o
+CC	= gcc
+FLAGS 	= -O2 -Wall
 
-all: $(APIS) servidor cliente
+all: servidor cliente
 
 servidor: servidor.c
-	$(CC) $(FLAGS) -o servidor $(APIS) servidor.c
+	$(CC) $(FLAGS) -o servidor servidor.c
 
 cliente: cliente.c
-	$(CC) $(FLAGS) -o cliente $(APIS) cliente.c
-
-my_socket_api.o: my_socket_api.c
-	$(CC) $(FLAGS) -c my_socket_api.c
+	$(CC) $(FLAGS) -o cliente cliente.c
 
 clean:
-	rm $(APIS) servidor cliente
+	rm servidor cliente

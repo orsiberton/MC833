@@ -14,11 +14,10 @@
 #define MAXDATASIZE 100
 
 int main (int argc, char **argv) {
-   int    listenfd, connfd;
+   int    listenfd, connfd, n;
    unsigned int peeraddr_len;
    struct sockaddr_in servaddr, peeraddr;
    char   buf[MAXDATASIZE];
-   time_t ticks;
 
    // verifica se a porta foi passado por parametro
    if (argc != 2) {
@@ -53,22 +52,37 @@ int main (int argc, char **argv) {
    // espera por conexões de clientes indefinidamente
    for ( ; ; ) {
 
-      // aceita as conexões
-      if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1 ) {
-         perror("accept");
-         exit(1);
-      }
+	// aceita as conexões
+	if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1 ) {
+	 perror("accept");
+	 exit(1);
+	}
 
+	if ( (n = read(connfd, buf, MAXDATASIZE)) > 0) {
+		buf[n] = 0;
+		if (fputs(buf, stdout) == EOF) {
+			perror("fputs error");
+			exit(1);
+		}
+		printf("\n");
+	}
+
+	write(connfd, buf, strlen(buf));
+
+      /*
       ticks = time(NULL);
-      snprintf(buf, sizeof(buf), "%.24s\r\n", ctime(&ticks));
+      printf(buf, sizeof(buf), "%.24s\r\n", ctime(&ticks));
       // escreve no socket para que o cliente receba a mensagem
       write(connfd, buf, strlen(buf));
 
       printf("Recebi uma conexão\n");
+      */
 
+      /*
       printf("Dormindo\n");
-      sleep(5);
+      sleep(10);
       printf("Acordando\n");
+      */
 
       // imprime dados do socket do cliente
       peeraddr_len = sizeof(struct sockaddr);

@@ -1,21 +1,9 @@
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <netdb.h>
-#include <string.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#define MAXLINE 4096
+#include "my_socket_api.h"
 
 int main(int argc, char **argv) {
-   int    sockfd, n, servaddr_len;
+   int    sockfd, n;
+   unsigned int servaddr_len;
    char   recvline[MAXLINE + 1];
-   char   error[MAXLINE + 1];
    struct sockaddr_in servaddr;
 
    // verifica se o host e a porta foram passados
@@ -25,10 +13,13 @@ int main(int argc, char **argv) {
    }
 
    // cria um socket TCP
+   sockfd = Socket(AF_INET, SOCK_STREAM, 0);
+   /*
    if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
       perror("socket error");
       exit(1);
    }
+   */
 
    // configura os parâmetros da conexão
    bzero(&servaddr, sizeof(servaddr));

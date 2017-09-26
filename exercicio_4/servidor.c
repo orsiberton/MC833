@@ -14,7 +14,8 @@
 #define MAXDATASIZE 100
 
 int main (int argc, char **argv) {
-   int    listenfd, connfd, peeraddr_len;
+   int    listenfd, connfd;
+   unsigned int peeraddr_len;
    struct sockaddr_in servaddr, peeraddr;
    char   buf[MAXDATASIZE];
    time_t ticks;
@@ -66,7 +67,7 @@ int main (int argc, char **argv) {
       printf("Recebi uma conexão\n");
 
       printf("Dormindo\n");
-      sleep(10);
+      sleep(5);
       printf("Acordando\n");
 
       // imprime dados do socket do cliente

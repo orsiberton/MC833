@@ -1,21 +1,9 @@
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <netdb.h>
-#include <string.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#define MAXLINE 4096
+#include "my_socket_api.h"
 
 int main(int argc, char **argv) {
    int    sockfd, n;
    unsigned int servaddr_len;
-   char   recvline[MAXLINE + 1];
+   char   recvline[MAXLINE];
    struct sockaddr_in servaddr;
 
    // verifica se o host e a porta foram passados
@@ -25,10 +13,7 @@ int main(int argc, char **argv) {
    }
 
    // cria um socket TCP
-   if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-      perror("socket error");
-      exit(1);
-   }
+   sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
    // configura os parâmetros da conexão
    bzero(&servaddr, sizeof(servaddr));
@@ -42,51 +27,47 @@ int main(int argc, char **argv) {
    }
 
    // abre a conexão com o servidor
-   if (connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
-      perror("connect error");
-      exit(1);
-   }
+   Connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
    // imprime dados do socket
    servaddr_len = sizeof(struct sockaddr_in);
    if (getsockname(sockfd, (struct sockaddr *) &servaddr, &servaddr_len) == -1) {
-	perror("getsockname() failed");
-	return -1;
+	    perror("getsockname() failed");
+	     return -1;
    }
    printf("IP address do socket: %s\n", inet_ntoa(servaddr.sin_addr));
    printf("Client port do socket: %d\n", (int) ntohs(servaddr.sin_port));
 
-   char input[MAXLINE + 1];
+   char input[MAXLINE];
    int foi = 0;
    do{
 
-	scanf("%s\n", input);
+    	scanf("%s\n", input);
 
-	if(input[0] != '\n'){
-		foi = 1;
+    	if(input[0] != '\n'){
+    		foi = 1;
 
-		printf("Vai enviar: %s\n", input);
+    		printf("Vai enviar: %s\n", input);
 
-		write(sockfd, input, strlen(input));
+    		write(sockfd, input, strlen(input));
 
-		// le o que foi recebido através do socket e imprime o conteúdo
-		if ( (n = read(sockfd, recvline, MAXLINE)) > 0) {
-			recvline[n] = 0;
-			if (fputs(recvline, stdout) == EOF) {
-				perror("fputs error");
-				exit(1);
-			}
-			printf("\n");
-		}
+    		// le o que foi recebido através do socket e imprime o conteúdo
+    		if ( (n = read(sockfd, recvline, MAXLINE)) > 0) {
+    			recvline[n] = 0;
+    			if (fputs(recvline, stdout) == EOF) {
+    				perror("fputs error");
+    				exit(1);
+    			}
+    			printf("\n");
+    		}
 
-		if (n < 0) {
-			perror("read error");
-			exit(1);
-		}
-	}
+    		if (n < 0) {
+    			perror("read error");
+    			exit(1);
+    		}
+    	}
 
    } while(input[0] != '\n' && !foi);
 
    exit(0);
 }
-

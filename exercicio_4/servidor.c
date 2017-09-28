@@ -1,23 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include <netdb.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <time.h>
-#include <unistd.h>
-
-#define LISTENQ 10
-#define MAXDATASIZE 100
+#include "my_socket_api.h"
 
 int main (int argc, char **argv) {
    int    listenfd, connfd, n;
    unsigned int peeraddr_len;
    struct sockaddr_in servaddr, peeraddr;
-   char   buf[MAXDATASIZE];
+   char   buf[MAXLINE];
 
    // verifica se a porta foi passado por parametro
    if (argc != 2) {
@@ -26,10 +13,7 @@ int main (int argc, char **argv) {
    }
 
    // cria um socket TCP
-   if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-      perror("socket");
-      exit(1);
-   }
+   listenfd = Socket(AF_INET, SOCK_STREAM, 0);
 
    // configura os parâmetros da conexão
    bzero(&servaddr, sizeof(servaddr));
@@ -38,36 +22,27 @@ int main (int argc, char **argv) {
    servaddr.sin_port        = htons(atoi(argv[1]));
 
    // faz o bind do socket TCP com o host:porta escolhidos
-   if (bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == -1) {
-      perror("bind");
-      exit(1);
-   }
+   Bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
 
    // ativa a socket para começar a receber conexões
-   if (listen(listenfd, LISTENQ) == -1) {
-      perror("listen");
-      exit(1);
-   }
+   Listen(listenfd, LISTENQ);
 
    // espera por conexões de clientes indefinidamente
    for ( ; ; ) {
 
-	// aceita as conexões
-	if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1 ) {
-	 perror("accept");
-	 exit(1);
-	}
+    	// aceita as conexões
+    	connfd = Accept(listenfd, (struct sockaddr *) NULL, NULL);
 
-	if ( (n = read(connfd, buf, MAXDATASIZE)) > 0) {
-		buf[n] = 0;
-		if (fputs(buf, stdout) == EOF) {
-			perror("fputs error");
-			exit(1);
-		}
-		printf("\n");
-	}
+    	if ( (n = read(connfd, buf, MAXLINE)) > 0) {
+    		buf[n] = 0;
+    		if (fputs(buf, stdout) == EOF) {
+    			perror("fputs error");
+    			exit(1);
+    		}
+    		printf("\n");
+    	}
 
-	write(connfd, buf, strlen(buf));
+    	write(connfd, buf, strlen(buf));
 
       /*
       ticks = time(NULL);

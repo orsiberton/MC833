@@ -11,7 +11,10 @@
 #include <netinet/in.h>
 
 #define MAXLINE 4096
-#define LISTENQ 10
-#define MAXDATASIZE 100
+#define LISTENQ 5
 
 int Socket(int family, int type, int flags);
+void Connect(int socket, const struct sockaddr *sockaddr, socklen_t sockaddr_len);
+void Bind(int socket, const struct sockaddr *sockaddr, socklen_t sockaddr_len);
+void Listen(int socket, int queue_size);
+int Accept(int socket, struct sockaddr *sockaddr, socklen_t *sockaddr_len);

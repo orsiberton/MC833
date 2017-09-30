@@ -55,3 +55,14 @@ int Accept(int socket, struct sockaddr *sockaddr, socklen_t *sockaddr_len) {
 
   return(sockfd);
 }
+
+/*
+  Função auxiliar para sair da conexão
+*/
+bool isExit(const char *message) {
+  if (strncmp(message, "exit\n", strlen(message)) == 0) {
+    return TRUE;
+  }
+
+  return FALSE;
+}

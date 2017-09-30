@@ -33,32 +33,6 @@ int main (int argc, char **argv) {
     	// aceita as conexões
     	connfd = Accept(listenfd, (struct sockaddr *) NULL, NULL);
 
-    	if ( (n = read(connfd, buf, MAXLINE)) > 0) {
-    		buf[n] = 0;
-    		if (fputs(buf, stdout) == EOF) {
-    			perror("fputs error");
-    			exit(1);
-    		}
-    		printf("\n");
-    	}
-
-    	write(connfd, buf, strlen(buf));
-
-      /*
-      ticks = time(NULL);
-      printf(buf, sizeof(buf), "%.24s\r\n", ctime(&ticks));
-      // escreve no socket para que o cliente receba a mensagem
-      write(connfd, buf, strlen(buf));
-
-      printf("Recebi uma conexão\n");
-      */
-
-      /*
-      printf("Dormindo\n");
-      sleep(10);
-      printf("Acordando\n");
-      */
-
       // imprime dados do socket do cliente
       peeraddr_len = sizeof(struct sockaddr);
       if (getpeername(connfd, (struct sockaddr *) &peeraddr, &peeraddr_len) == -1) {
@@ -67,6 +41,19 @@ int main (int argc, char **argv) {
       }
       printf("IP address do cliente: %s\n", inet_ntoa(peeraddr.sin_addr));
       printf("Porta do cliente: %d\n", (int) ntohs(peeraddr.sin_port));
+
+      while ((n = read(connfd, buf, MAXLINE)) > 0) {
+
+        printf("Enviando ao cliente %s\n", buf);
+
+        // Encerra a conexao PARTE 2 DO TRABALHO
+        //if (isExit(buf)) {
+        //  break;
+        //}
+
+        write(connfd, buf, strlen(buf));
+        memset(buf, 0, sizeof(buf));
+      }
 
       close(connfd);
    }

@@ -3,7 +3,7 @@
 int main(int argc, char **argv) {
    int    sockfd, n;
    unsigned int servaddr_len;
-   char   recvline[MAXLINE];
+   char   recvline[MAXLINE], input[MAXLINE];;
    struct sockaddr_in servaddr;
 
    // verifica se o host e a porta foram passados
@@ -38,36 +38,17 @@ int main(int argc, char **argv) {
    printf("IP address do socket: %s\n", inet_ntoa(servaddr.sin_addr));
    printf("Client port do socket: %d\n", (int) ntohs(servaddr.sin_port));
 
-   char input[MAXLINE];
-   int foi = 0;
-   do{
+   while (fgets(input, MAXLINE, stdin) != NULL) {
+     write(sockfd, input, strlen(input));
 
-    	scanf("%s\n", input);
-
-    	if(input[0] != '\n'){
-    		foi = 1;
-
-    		printf("Vai enviar: %s\n", input);
-
-    		write(sockfd, input, strlen(input));
-
-    		// le o que foi recebido através do socket e imprime o conteúdo
-    		if ( (n = read(sockfd, recvline, MAXLINE)) > 0) {
-    			recvline[n] = 0;
-    			if (fputs(recvline, stdout) == EOF) {
-    				perror("fputs error");
-    				exit(1);
-    			}
-    			printf("\n");
-    		}
-
-    		if (n < 0) {
-    			perror("read error");
-    			exit(1);
-    		}
-    	}
-
-   } while(input[0] != '\n' && !foi);
+     // le o que foi recebido através do socket e imprime o conteúdo
+     if ((n = read(sockfd, recvline, MAXLINE)) < 0) {
+       perror("read error");
+       exit(1);
+     }
+     recvline[n++] = 0;
+     printf("%s", recvline);
+   }
 
    exit(0);
 }

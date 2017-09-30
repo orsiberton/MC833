@@ -66,3 +66,16 @@ bool isExit(const char *message) {
 
   return FALSE;
 }
+
+/*
+  Função que abre outro processo
+*/
+pid_t Fork() {
+  pid_t pid;
+  if ((pid = fork()) < 0) {
+    perror("Fork error");
+    exit(1);
+  }
+
+  return pid;
+}

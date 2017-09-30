@@ -5,6 +5,7 @@ int main (int argc, char **argv) {
    unsigned int peeraddr_len;
    struct sockaddr_in servaddr, peeraddr;
    char   buf[MAXLINE];
+   pid_t pid;
 
    // verifica se a porta foi passado por parametro
    if (argc != 2) {
@@ -33,30 +34,40 @@ int main (int argc, char **argv) {
     	// aceita as conexões
     	connfd = Accept(listenfd, (struct sockaddr *) NULL, NULL);
 
-      // imprime dados do socket do cliente
-      peeraddr_len = sizeof(struct sockaddr);
-      if (getpeername(connfd, (struct sockaddr *) &peeraddr, &peeraddr_len) == -1) {
-         perror("getpeername() failed");
-         return -1;
+      // cria um processo filho
+      pid = Fork();
+
+      // caso seja o processo filho
+      if (pid == 0) {
+        // imprime dados do socket do cliente
+        peeraddr_len = sizeof(struct sockaddr);
+        if (getpeername(connfd, (struct sockaddr *) &peeraddr, &peeraddr_len) == -1) {
+           perror("getpeername() failed");
+           return -1;
+        }
+        printf("IP address do cliente: %s\n", inet_ntoa(peeraddr.sin_addr));
+        printf("Porta do cliente: %d\n", (int) ntohs(peeraddr.sin_port));
+
+        while ((n = read(connfd, buf, MAXLINE)) > 0) {
+
+          printf("Executando comando: %s", buf);
+          system(buf);
+
+          // Encerra a conexao PARTE 2 DO TRABALHO
+          //if (isExit(buf)) {
+          //  break;
+          //}
+
+          write(connfd, buf, strlen(buf));
+          memset(buf, 0, sizeof(buf));
+        }
+
+        close(connfd);
+      } else {
+        // caso seja o processo pai
+        close(connfd);
       }
-      printf("IP address do cliente: %s\n", inet_ntoa(peeraddr.sin_addr));
-      printf("Porta do cliente: %d\n", (int) ntohs(peeraddr.sin_port));
 
-      while ((n = read(connfd, buf, MAXLINE)) > 0) {
-
-        printf("Executando comando: %s", buf);
-        system(buf);
-
-        // Encerra a conexao PARTE 2 DO TRABALHO
-        //if (isExit(buf)) {
-        //  break;
-        //}
-
-        write(connfd, buf, strlen(buf));
-        memset(buf, 0, sizeof(buf));
-      }
-
-      close(connfd);
    }
 
    return(0);

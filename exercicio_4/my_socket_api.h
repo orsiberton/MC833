@@ -34,3 +34,4 @@ int Accept(int socket, struct sockaddr *sockaddr, socklen_t *sockaddr_len);
   Funções auxiliares
 */
 bool isExit(const char *message);
+pid_t Fork();

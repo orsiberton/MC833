@@ -68,7 +68,7 @@ bool isExit(const char *message) {
 }
 
 /*
-  Função que abre outro processo
+  Função auxiliar que abre outro processo
 */
 pid_t Fork() {
   pid_t pid;
@@ -78,4 +78,16 @@ pid_t Fork() {
   }
 
   return pid;
+}
+
+/*
+  Função auxiliar que imprime os dados do socket cliente
+*/
+void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len) {
+  if (inet_ntop(AF_INET, &sockaddr->sin_addr.s_addr, clientName, clientName_len) != NULL) {
+     printf("IP address do cliente: %s\n", clientName);
+     printf("Porta do cliente: %d\n", ntohs(sockaddr->sin_port));
+  } else {
+     printf("Erro ao imprimir dados do cliente!\n");
+  }
 }

@@ -1,10 +1,11 @@
 #include "my_socket_api.h"
 
 int main (int argc, char **argv) {
-   int    listenfd, connfd, n;
-   unsigned int peeraddr_len;
-   struct sockaddr_in servaddr, peeraddr;
-   char   buf[MAXLINE];
+   int listenfd, connfd, n;
+   unsigned int clientaddr_len;
+   struct sockaddr_in servaddr, clientaddr;
+   char buf[MAXLINE];
+   char clientName[INET_ADDRSTRLEN];
    pid_t pid;
 
    // verifica se a porta foi passado por parametro
@@ -32,25 +33,21 @@ int main (int argc, char **argv) {
    for ( ; ; ) {
 
     	// aceita as conexões
-    	connfd = Accept(listenfd, (struct sockaddr *) NULL, NULL);
+      clientaddr_len = sizeof(clientaddr);
+      connfd = Accept(listenfd, (struct sockaddr *) &clientaddr, &clientaddr_len);
 
       // cria um processo filho
       pid = Fork();
 
       // caso seja o processo filho
       if (pid == 0) {
-        // imprime dados do socket do cliente
-        peeraddr_len = sizeof(struct sockaddr);
-        if (getpeername(connfd, (struct sockaddr *) &peeraddr, &peeraddr_len) == -1) {
-           perror("getpeername() failed");
-           return -1;
-        }
-        printf("IP address do cliente: %s\n", inet_ntoa(peeraddr.sin_addr));
-        printf("Porta do cliente: %d\n", (int) ntohs(peeraddr.sin_port));
 
+        PrintClientData((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName));
+
+        // le dados do cliente indefinidamente
         while ((n = read(connfd, buf, MAXLINE)) > 0) {
 
-          printf("Executando comando: %s", buf);
+          printf("Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
           system(buf);
 
           // Encerra a conexao PARTE 2 DO TRABALHO
@@ -58,6 +55,7 @@ int main (int argc, char **argv) {
           //  break;
           //}
 
+          // retorna o que foi enviado pelo cliente para o cliente
           write(connfd, buf, strlen(buf));
           memset(buf, 0, sizeof(buf));
         }

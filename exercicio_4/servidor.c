@@ -41,6 +41,8 @@ int main (int argc, char **argv) {
 
       // caso seja o processo filho
       if (pid == 0) {
+        // fecha a conexão de escuta para esse processo filho
+        close(listenfd);
 
         PrintClientData((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName));
 

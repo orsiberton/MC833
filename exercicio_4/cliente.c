@@ -2,7 +2,6 @@
 
 int main(int argc, char **argv) {
    int    sockfd, n;
-   unsigned int servaddr_len;
    char   recvline[MAXLINE], input[MAXLINE];;
    struct sockaddr_in servaddr;
 
@@ -30,13 +29,7 @@ int main(int argc, char **argv) {
    Connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
    // imprime dados do socket
-   servaddr_len = sizeof(struct sockaddr_in);
-   if (getsockname(sockfd, (struct sockaddr *) &servaddr, &servaddr_len) == -1) {
-	    perror("getsockname() failed");
-	     return -1;
-   }
-   printf("IP address do socket: %s\n", inet_ntoa(servaddr.sin_addr));
-   printf("Client port do socket: %d\n", (int) ntohs(servaddr.sin_port));
+   PrintData(sockfd, (struct sockaddr_in *) &servaddr, argv[1], argv[2]);
 
    while (fgets(input, MAXLINE, stdin) != NULL) {
      write(sockfd, input, strlen(input));

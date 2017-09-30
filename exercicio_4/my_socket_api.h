@@ -36,3 +36,4 @@ int Accept(int socket, struct sockaddr *sockaddr, socklen_t *sockaddr_len);
 bool isExit(const char *message);
 pid_t Fork();
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
+void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort);

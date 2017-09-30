@@ -85,9 +85,24 @@ pid_t Fork() {
 */
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len) {
   if (inet_ntop(AF_INET, &sockaddr->sin_addr.s_addr, clientName, clientName_len) != NULL) {
-     printf("IP address do cliente: %s\n", clientName);
+     printf("Endereco IP do cliente: %s\n", clientName);
      printf("Porta do cliente: %d\n", ntohs(sockaddr->sin_port));
   } else {
      printf("Erro ao imprimir dados do cliente!\n");
   }
+}
+
+/*
+  Função auxiliar que imprime os dados do socket do lado do cliente
+*/
+void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort) {
+  unsigned int sockaddr_len = sizeof(struct sockaddr);
+  if (getsockname(socket, (struct sockaddr *) sockaddr, &sockaddr_len) == -1) {
+    perror("getsockname() failed");
+    exit(1);
+  }
+  printf("Endereco IP remoto do socket: %s\n", inet_ntoa(sockaddr->sin_addr));
+  printf("Porta remota do socket: %d\n", (int) ntohs(sockaddr->sin_port));
+  printf("Endereco IP local do socket: %s\n", localHost);
+  printf("Porta local do socket: %s\n", localPort);
 }

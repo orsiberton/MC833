@@ -44,7 +44,8 @@ int main (int argc, char **argv) {
 
       while ((n = read(connfd, buf, MAXLINE)) > 0) {
 
-        printf("Enviando ao cliente %s\n", buf);
+        printf("Executando comando: %s", buf);
+        system(buf);
 
         // Encerra a conexao PARTE 2 DO TRABALHO
         //if (isExit(buf)) {

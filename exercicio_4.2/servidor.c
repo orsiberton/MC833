@@ -7,6 +7,7 @@ int main (int argc, char **argv) {
    char buf[MAXLINE];
    char clientName[INET_ADDRSTRLEN];
    pid_t pid;
+   bool isExiting = FALSE;
 
    // verifica se a porta foi passado por parametro
    if (argc != 2) {
@@ -52,10 +53,12 @@ int main (int argc, char **argv) {
           printf("Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
           system(buf);
 
-          // Encerra a conexao PARTE 2 DO TRABALHO
-          //if (isExit(buf)) {
-          //  break;
-          //}
+          //Encerra a conexao
+          if (isExit(buf)) {
+            isExiting = TRUE;
+            printf("Cliente (%s%c%d) fazendo logout!\n", clientName, '/', ntohs(clientaddr.sin_port));
+            break;
+          }
 
           // retorna o que foi enviado pelo cliente para o cliente
           write(connfd, buf, strlen(buf));
@@ -68,6 +71,10 @@ int main (int argc, char **argv) {
         close(connfd);
       }
 
+      // encerra o loop do processo filho
+      if (isExiting) {
+        break;
+      }
    }
 
    return(0);

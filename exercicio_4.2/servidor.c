@@ -58,6 +58,7 @@ int main (int argc, char **argv) {
         // le dados do cliente indefinidamente
         while ((n = read(connfd, buf, MAXLINE)) > 0) {
 
+          printf("Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
           fprintf(f, "Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
           
 	  // abre um terminal com o comando lido do cliente
@@ -82,7 +83,8 @@ int main (int argc, char **argv) {
 
           memset(buf, 0, sizeof(buf));
         }
-        
+
+        PrintClientDataClose((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName));        
         FPrintClientDataClose((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName), f);
         close(connfd);
       } else {

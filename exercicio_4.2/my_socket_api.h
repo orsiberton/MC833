@@ -37,6 +37,7 @@ bool isExit(const char *message);
 pid_t Fork();
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
 void FPrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f);
+void PrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
 void FPrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f);
 void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort);
 

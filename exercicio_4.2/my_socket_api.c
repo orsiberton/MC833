@@ -115,6 +115,26 @@ void FPrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int 
 }
 
 /*
+  Função auxiliar que imprime os dados do socket cliente ao fechar socket
+*/
+void PrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len) {
+  if (inet_ntop(AF_INET, &sockaddr->sin_addr.s_addr, clientName, clientName_len) != NULL) {
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+
+    time(&timer);
+    tm_info = localtime(&timer);
+
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+     printf("%s - closing connection with %s/%d\n", buffer, clientName, ntohs(sockaddr->sin_port));
+  } else {
+     printf("Erro ao imprimir dados do cliente!\n");
+  }
+}
+
+/*
   Função auxiliar que imprime os dados do socket cliente em arquivo ao fechar socket
 */
 void FPrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f) {

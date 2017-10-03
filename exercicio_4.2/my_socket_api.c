@@ -85,8 +85,18 @@ pid_t Fork() {
 */
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len) {
   if (inet_ntop(AF_INET, &sockaddr->sin_addr.s_addr, clientName, clientName_len) != NULL) {
-     printf("Endereco IP do cliente: %s\n", clientName);
-     printf("Porta do cliente: %d\n", ntohs(sockaddr->sin_port));
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+
+    time(&timer);
+    tm_info = localtime(&timer);
+
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+    printf("%s - Connection opened\n", buffer);
+    printf("Endereco IP do cliente: %s\n", clientName);
+    printf("Porta do cliente: %d\n", ntohs(sockaddr->sin_port));
   } else {
      printf("Erro ao imprimir dados do cliente!\n");
   }
@@ -106,9 +116,9 @@ void FPrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int 
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-     fprintf(f, "%s - Connection opened\n", buffer);
-     fprintf(f, "Endereco IP do cliente: %s\n", clientName);
-     fprintf(f, "Porta do cliente: %d\n", ntohs(sockaddr->sin_port));
+    fprintf(f, "%s - Connection opened\n", buffer);
+    fprintf(f, "Endereco IP do cliente: %s\n", clientName);
+    fprintf(f, "Porta do cliente: %d\n", ntohs(sockaddr->sin_port));
   } else {
      fprintf(f, "Erro ao imprimir dados do cliente!\n");
   }

@@ -53,6 +53,7 @@ int main (int argc, char **argv) {
         close(listenfd);
 
 	      // imprime no log os dados da conexao aberta
+        PrintClientData((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName));
         FPrintClientData((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName), f);
 
         // le dados do cliente indefinidamente

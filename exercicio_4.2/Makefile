@@ -14,4 +14,4 @@ my_socket_api.o: my_socket_api.c
 	$(CC) $(FLAGS) -c my_socket_api.c
 
 clean:
-	rm $(APIS) servidor cliente
+	rm $(APIS) servidor cliente log_server.txt

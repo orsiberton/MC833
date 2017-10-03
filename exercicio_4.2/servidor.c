@@ -31,7 +31,7 @@ int main (int argc, char **argv) {
    Listen(listenfd, LISTENQ);
 
    // abre arquivo de log
-   FILE *f = fopen("log_server.txt", "w");
+   FILE *f = fopen("log_server.txt", "a+");
    if (f == NULL) {
 	    printf("Error opening file!\n");
 	    exit(1);

@@ -93,7 +93,7 @@ void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int c
 }
 
 /*
-  Função auxiliar que imprime os dados do socket cliente
+  Função auxiliar que imprime os dados do socket cliente em arquivo
 */
 void FPrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f) {
   if (inet_ntop(AF_INET, &sockaddr->sin_addr.s_addr, clientName, clientName_len) != NULL) {
@@ -115,7 +115,7 @@ void FPrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int 
 }
 
 /*
-  Função auxiliar que imprime os dados do socket cliente
+  Função auxiliar que imprime os dados do socket cliente em arquivo ao fechar socket
 */
 void FPrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f) {
   if (inet_ntop(AF_INET, &sockaddr->sin_addr.s_addr, clientName, clientName_len) != NULL) {

@@ -30,12 +30,12 @@ int main (int argc, char **argv) {
    // ativa a socket para começar a receber conexões
    Listen(listenfd, LISTENQ);
 
-	FILE *f = fopen("log_server.txt", "w");
-	if (f == NULL)
-	{
-		printf("Error opening file!\n");
-		exit(1);
-	}
+   // abre arquivo de log
+   FILE *f = fopen("log_server.txt", "w");
+   if (f == NULL) {
+	printf("Error opening file!\n");
+	exit(1);
+   }
 
    // espera por conexões de clientes indefinidamente
    for ( ; ; ) {
@@ -52,29 +52,34 @@ int main (int argc, char **argv) {
         // fecha a conexão de escuta para esse processo filho
         close(listenfd);
 
+	// imprime no log os dados da conexao aberta
         FPrintClientData((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName), f);
 
         // le dados do cliente indefinidamente
         while ((n = read(connfd, buf, MAXLINE)) > 0) {
 
           fprintf(f, "Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
-          //system(buf);
           
+	  // abre um terminal com o comando lido do cliente
           FILE *fp = popen(buf, "r");
-		  fscanf(fp, "%s", systembuf);
-		  fprintf(f, "Retorno: %s\n", systembuf);
-		  write(connfd, systembuf, strlen(systembuf));
-  		  pclose(fp);
 
-          // Encerra a conexao PARTE 2 DO TRABALHO
+	  // recebe o resultado apos executar o comando
+	  fscanf(fp, "%s", systembuf);
+
+          // coloca o resultado no arquivo de log
+	  fprintf(f, "Retorno: %s\n", systembuf);
+
+          // envia ao cliente o resultado do comando
+	  write(connfd, systembuf, strlen(systembuf));
+
+	  // fecha pseudoarquivo "terminal"
+	  pclose(fp);
+
+          // Encerra a conexao
           if (isExit(buf)) {
-		isExiting = TRUE;
-		//printf("Cliente (%s%c%d) fazendo logout!\n", clientName, '/', ntohs(clientaddr.sin_port));
-
+	     isExiting = TRUE;
           }
 
-          // retorna o que foi enviado pelo cliente para o cliente
-          //write(connfd, buf, strlen(buf));
           memset(buf, 0, sizeof(buf));
         }
         
@@ -91,7 +96,8 @@ int main (int argc, char **argv) {
 
    }
    
-	fclose(f);
+   // fecha arquivo de log
+   fclose(f);
 
    return(0);
 }

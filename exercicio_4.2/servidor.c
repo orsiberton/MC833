@@ -4,7 +4,7 @@ int main (int argc, char **argv) {
    int listenfd, connfd, n;
    unsigned int clientaddr_len;
    struct sockaddr_in servaddr, clientaddr;
-   char buf[MAXLINE];
+   char buf[MAXLINE], systembuf[MAXLINE];
    char clientName[INET_ADDRSTRLEN];
    pid_t pid;
    bool isExiting = FALSE;
@@ -30,6 +30,13 @@ int main (int argc, char **argv) {
    // ativa a socket para começar a receber conexões
    Listen(listenfd, LISTENQ);
 
+	FILE *f = fopen("log_server.txt", "w");
+	if (f == NULL)
+	{
+		printf("Error opening file!\n");
+		exit(1);
+	}
+
    // espera por conexões de clientes indefinidamente
    for ( ; ; ) {
 
@@ -45,37 +52,46 @@ int main (int argc, char **argv) {
         // fecha a conexão de escuta para esse processo filho
         close(listenfd);
 
-        PrintClientData((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName));
+        FPrintClientData((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName), f);
 
         // le dados do cliente indefinidamente
         while ((n = read(connfd, buf, MAXLINE)) > 0) {
 
-          printf("Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
-          system(buf);
+          fprintf(f, "Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
+          //system(buf);
+          
+          FILE *fp = popen(buf, "r");
+		  fscanf(fp, "%s", systembuf);
+		  fprintf(f, "Retorno: %s\n", systembuf);
+		  write(connfd, systembuf, strlen(systembuf));
+  		  pclose(fp);
 
-          //Encerra a conexao
+          // Encerra a conexao PARTE 2 DO TRABALHO
           if (isExit(buf)) {
-            isExiting = TRUE;
-            printf("Cliente (%s%c%d) fazendo logout!\n", clientName, '/', ntohs(clientaddr.sin_port));
-            break;
+		isExiting = TRUE;
+		//printf("Cliente (%s%c%d) fazendo logout!\n", clientName, '/', ntohs(clientaddr.sin_port));
+
           }
 
           // retorna o que foi enviado pelo cliente para o cliente
-          write(connfd, buf, strlen(buf));
+          //write(connfd, buf, strlen(buf));
           memset(buf, 0, sizeof(buf));
         }
-
+        
+        FPrintClientDataClose((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName), f);
         close(connfd);
       } else {
         // caso seja o processo pai
         close(connfd);
       }
 
-      // encerra o loop do processo filho
-      if (isExiting) {
-        break;
-      }
+	if(isExiting){
+		break;
+	}
+
    }
+   
+	fclose(f);
 
    return(0);
 }

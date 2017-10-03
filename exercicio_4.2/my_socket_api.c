@@ -93,6 +93,48 @@ void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int c
 }
 
 /*
+  Função auxiliar que imprime os dados do socket cliente
+*/
+void FPrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f) {
+  if (inet_ntop(AF_INET, &sockaddr->sin_addr.s_addr, clientName, clientName_len) != NULL) {
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+
+    time(&timer);
+    tm_info = localtime(&timer);
+
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+     fprintf(f, "%s - Connection opened\n", buffer);
+     fprintf(f, "Endereco IP do cliente: %s\n", clientName);
+     fprintf(f, "Porta do cliente: %d\n", ntohs(sockaddr->sin_port));
+  } else {
+     fprintf(f, "Erro ao imprimir dados do cliente!\n");
+  }
+}
+
+/*
+  Função auxiliar que imprime os dados do socket cliente
+*/
+void FPrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f) {
+  if (inet_ntop(AF_INET, &sockaddr->sin_addr.s_addr, clientName, clientName_len) != NULL) {
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+
+    time(&timer);
+    tm_info = localtime(&timer);
+
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+     fprintf(f, "%s - closing connection with %s/%d\n", buffer, clientName, ntohs(sockaddr->sin_port));
+  } else {
+     fprintf(f, "Erro ao imprimir dados do cliente!\n");
+  }
+}
+
+/*
   Função auxiliar que imprime os dados do socket do lado do cliente
 */
 void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort) {

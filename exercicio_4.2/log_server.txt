@@ -1,0 +1,6 @@
+2017-10-02 21:52:52 - Connection opened
+Endereco IP do cliente: 177.220.84.89
+Porta do cliente: 47842
+Executando comando (177.220.84.89/47842): ls
+Retorno: cliente
+2017-10-02 21:52:55 - closing connection with 177.220.84.89 - 47842

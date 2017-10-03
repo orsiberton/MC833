@@ -4,7 +4,7 @@ int main (int argc, char **argv) {
    int listenfd, connfd, n;
    unsigned int clientaddr_len;
    struct sockaddr_in servaddr, clientaddr;
-   char buf[MAXLINE], systembuf[MAXLINE];
+   char buf[MAXLINE], systembuf[MAXLINE], output[MAXLINE];
    char clientName[INET_ADDRSTRLEN];
    pid_t pid;
    bool isExiting = FALSE;
@@ -73,18 +73,21 @@ int main (int argc, char **argv) {
       	  // abre um terminal com o comando lido do cliente
           FILE *fp = popen(buf, "r");
 
-      	  // recebe o resultado apos executar o comando
-      	  fscanf(fp, "%s\n", systembuf);
+          // le o resultado do comando executado
+          while (fgets(systembuf, sizeof(systembuf) - 1, fp) != NULL) {
+            strcat(output, systembuf);
+          }
 
           // coloca o resultado no arquivo de log
-      	  fprintf(f, "Retorno: %s\n", systembuf);
+      	  fprintf(f, "Retorno:\n%s\n", output);
 
       	  // fecha pseudoarquivo "terminal"
       	  pclose(fp);
 
           // envia ao cliente o resultado do comando
-      	  write(connfd, systembuf, strlen(systembuf));
+      	  write(connfd, output, strlen(output));
           memset(buf, 0, sizeof(buf));
+          memset(output, 0, sizeof(output));
         }
 
         close(connfd);

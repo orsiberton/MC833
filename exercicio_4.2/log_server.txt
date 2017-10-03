@@ -1,6 +1,9 @@
-2017-10-02 22:04:09 - Connection opened
-Endereco IP do cliente: 177.220.84.153
-Porta do cliente: 45368
-Executando comando (177.220.84.153/45368): ls
+2017-10-02 22:48:00 - Connection opened
+Endereco IP do cliente: 127.0.0.1
+Porta do cliente: 42480
+Executando comando (127.0.0.1/42480): ls
 Retorno: cliente
-2017-10-02 22:04:19 - closing connection with 177.220.84.153/45368
+Executando comando (127.0.0.1/42480): pwd
+Retorno: /home/bberton/Documents/mc833/MC833/exercicio_4.2
+Executando comando (127.0.0.1/42480): exit
+2017-10-02 22:48:07 - closing connection with 127.0.0.1/42480

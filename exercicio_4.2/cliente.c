@@ -31,8 +31,13 @@ int main(int argc, char **argv) {
    // imprime dados do socket
    PrintData(sockfd, (struct sockaddr_in *) &servaddr, argv[1], argv[2]);
 
-   while (strcmp(fgets(input, MAXLINE, stdin), "exit\n") != 0) {
+    while (fgets(input, MAXLINE, stdin) != NULL) {
      write(sockfd, input, strlen(input));
+
+     // termina execução do cliente caso o cliente queira
+     if (isExit(input)) {
+       break;
+     }
 
      // le o que foi recebido através do socket e imprime o conteúdo
      if ((n = read(sockfd, recvline, MAXLINE)) < 0) {

@@ -33,8 +33,8 @@ int main (int argc, char **argv) {
    // abre arquivo de log
    FILE *f = fopen("log_server.txt", "w");
    if (f == NULL) {
-	printf("Error opening file!\n");
-	exit(1);
+	    printf("Error opening file!\n");
+	    exit(1);
    }
 
    // espera por conexões de clientes indefinidamente
@@ -52,7 +52,7 @@ int main (int argc, char **argv) {
         // fecha a conexão de escuta para esse processo filho
         close(listenfd);
 
-	// imprime no log os dados da conexao aberta
+	      // imprime no log os dados da conexao aberta
         FPrintClientData((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName), f);
 
         // le dados do cliente indefinidamente
@@ -60,44 +60,44 @@ int main (int argc, char **argv) {
 
           printf("Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
           fprintf(f, "Executando comando (%s%c%d): %s", clientName, '/', ntohs(clientaddr.sin_port), buf);
-          
-	  // abre um terminal com o comando lido do cliente
-          FILE *fp = popen(buf, "r");
-
-	  // recebe o resultado apos executar o comando
-	  fscanf(fp, "%s", systembuf);
-
-          // coloca o resultado no arquivo de log
-	  fprintf(f, "Retorno: %s\n", systembuf);
-
-          // envia ao cliente o resultado do comando
-	  write(connfd, systembuf, strlen(systembuf));
-
-	  // fecha pseudoarquivo "terminal"
-	  pclose(fp);
 
           // Encerra a conexao
           if (isExit(buf)) {
-	     isExiting = TRUE;
+	           isExiting = TRUE;
+             PrintClientDataClose((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName));
+             FPrintClientDataClose((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName), f);
+             break;
           }
 
+      	  // abre um terminal com o comando lido do cliente
+          FILE *fp = popen(buf, "r");
+
+      	  // recebe o resultado apos executar o comando
+      	  fscanf(fp, "%s\n", systembuf);
+
+          // coloca o resultado no arquivo de log
+      	  fprintf(f, "Retorno: %s\n", systembuf);
+
+      	  // fecha pseudoarquivo "terminal"
+      	  pclose(fp);
+
+          // envia ao cliente o resultado do comando
+      	  write(connfd, systembuf, strlen(systembuf));
           memset(buf, 0, sizeof(buf));
         }
 
-        PrintClientDataClose((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName));        
-        FPrintClientDataClose((struct sockaddr_in *) &clientaddr, clientName, sizeof(clientName), f);
         close(connfd);
       } else {
         // caso seja o processo pai
         close(connfd);
       }
 
-	if(isExiting){
-		break;
-	}
+    	if (isExiting) {
+    		break;
+    	}
 
    }
-   
+
    // fecha arquivo de log
    fclose(f);
 

@@ -8,12 +8,16 @@ int main (int argc, char **argv) {
    char clientName[INET_ADDRSTRLEN];
    pid_t pid;
    bool isExiting = FALSE;
+   struct sigaction mySigAction;
 
    // verifica se a porta foi passado por parametro
-   if (argc != 2) {
-      perror("Porta nao informada!");
+   if (argc != 3) {
+      perror("Porta/Backlog nao informado(s)!");
       exit(1);
    }
+
+   // ativa o handler para lidar com processos zumbis
+   zombieProcessHandler(&mySigAction);
 
    // cria um socket TCP
    listenfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -28,7 +32,7 @@ int main (int argc, char **argv) {
    Bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
 
    // ativa a socket para começar a receber conexões
-   Listen(listenfd, LISTENQ);
+   Listen(listenfd, atoi(argv[2]));
 
    // abre arquivo de log
    FILE *f = fopen("log_server.txt", "a+");
@@ -49,6 +53,7 @@ int main (int argc, char **argv) {
 
       // caso seja o processo filho
       if (pid == 0) {
+        sleep(60);
         // fecha a conexão de escuta para esse processo filho
         close(listenfd);
 

@@ -47,13 +47,13 @@ int main (int argc, char **argv) {
     	// aceita as conexões
       clientaddr_len = sizeof(clientaddr);
       connfd = Accept(listenfd, (struct sockaddr *) &clientaddr, &clientaddr_len);
+      sleep(60);
 
       // cria um processo filho
       pid = Fork();
 
       // caso seja o processo filho
       if (pid == 0) {
-        sleep(60);
         // fecha a conexão de escuta para esse processo filho
         close(listenfd);
 

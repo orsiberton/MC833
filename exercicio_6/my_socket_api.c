@@ -37,7 +37,6 @@ void Bind(int socket, const struct sockaddr *sockaddr, socklen_t sockaddr_len) {
   Função para deixar o socket ouvindo conexões com um certo buffer
 */
 void Listen(int socket, int queue_size) {
-  printf("Usando queue_size: %d\n", queue_size);
   if (listen(socket, queue_size) == -1) {
      perror("Listen error");
      exit(1);
@@ -178,17 +177,4 @@ void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, 
   printf("Porta remota do socket: %d\n", (int) ntohs(sockaddr->sin_port));
   printf("Endereco IP local do socket: %s\n", localHost);
   printf("Porta local do socket: %s\n", localPort);
-}
-
-/*
-  Função auxiliar para adicionar um handler de processos zumbis
-*/
-void zombieProcessHandler(struct sigaction *sa) {
-  sigemptyset(&sa->sa_mask);
-  sa->sa_flags = SA_NOCLDWAIT;
-  sa->sa_handler = SIG_DFL;
-  if (sigaction(SIGCHLD, sa, NULL) == -1) {
-    perror("Sigaction error");
-    exit(1);
-  }
 }

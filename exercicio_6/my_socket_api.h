@@ -5,11 +5,11 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <time.h>
-#include <signal.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <sys/select.h>
 
 #define MAXLINE 4096
 #define LISTENQ 5
@@ -41,4 +41,4 @@ void FPrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int 
 void PrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
 void FPrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f);
 void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort);
-void zombieProcessHandler(struct sigaction *sa);
+

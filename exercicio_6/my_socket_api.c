@@ -178,3 +178,9 @@ void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, 
   printf("Endereco IP local do socket: %s\n", localHost);
   printf("Porta local do socket: %s\n", localPort);
 }
+
+int Max(int i, int j){
+	if(i > j)
+		return i;
+	return j;
+}

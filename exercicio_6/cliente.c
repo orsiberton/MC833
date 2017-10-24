@@ -32,9 +32,6 @@ int main(int argc, char **argv) {
    // abre a conexão com o servidor
    Connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
-   // imprime dados do socket
-   PrintData(sockfd, (struct sockaddr_in *) &servaddr, argv[1], argv[2]);
-
     while (fgets(input, MAXLINE, in) != NULL) {
      write(sockfd, input, strlen(input));
 

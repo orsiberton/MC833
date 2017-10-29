@@ -1,22 +1,26 @@
 #include "my_socket_api.h"
 
-// BOM EXEMPLO
-// http://www.binarytides.com/multiple-socket-connections-fdset-select-linux/
-
 int main (int argc, char **argv) {
    int listenfd, n, port, new_socket, activity;
    unsigned int clientaddr_len, maxfdp1;
    struct sockaddr_in servaddr, clientaddr;
    char buf[MAXLINE];
    fd_set rset;
+   FILE *log;
 
    // verifica se o nome do arquivo foi passado por parametro
-   if (argc != 2) {
-      perror("Arquivo nao informado!");
+   if (argc != 3) {
+      perror("Porta/Log nao informado!");
       exit(0);
    }
    
    port = atoi(argv[1]);
+   log = fopen(argv[2], "w");
+
+   if(log == NULL){
+      perror("Error creating log");
+      exit(0);
+   }
 
    // cria um socket TCP
    listenfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -36,6 +40,7 @@ int main (int argc, char **argv) {
 
    // espera por conexões de clientes indefinidamente
    for ( ; ; ) {
+
       FD_SET(listenfd, &rset);
       
       maxfdp1 = listenfd;
@@ -46,27 +51,30 @@ int main (int argc, char **argv) {
             printf("select error");
       }
 
+      if ((new_socket = accept(listenfd, (struct sockaddr *)&clientaddr, (socklen_t*)&clientaddr_len))<0){
+	   perror("accept");
+	   exit(EXIT_FAILURE);
+      }
 
-	if (FD_ISSET(listenfd, &rset)) {
-		if ((new_socket = accept(listenfd, (struct sockaddr *)&clientaddr, (socklen_t*)&clientaddr_len))<0){
-			perror("accept");
-	                exit(EXIT_FAILURE);
-		}
-		
+	while (FD_ISSET(listenfd, &rset)) {
 		if ((n = read(new_socket, buf, MAXLINE)) < 0) {
 		       perror("read error");
 		       exit(1);
      		}
+
+                fprintf(log, "%s", buf);
 		
 		if( send(new_socket, buf, strlen(buf), 0) != strlen(buf) ) {
 	                perror("send");
 		}
+
 	}
 
    }
 
    // fecha arquivo de log
    close(listenfd);
+   fclose(log);
 
    return(0);
 }

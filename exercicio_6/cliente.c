@@ -8,12 +8,12 @@ int main(int argc, char **argv) {
 
    // verifica se o host e a porta foram passados
    if (argc != 5) {
-      perror("Host/Porta nao informados!");
+      perror("Host/Porta/Entrada/Saida nao informados!/n");
       exit(1);
    }
 
    in = fopen(argv[3], "r");
-   out = fopen(argv[4], "a");
+   out = fopen(argv[4], "w");
 
    // cria um socket TCP
    sockfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -45,9 +45,13 @@ int main(int argc, char **argv) {
        perror("read error");
        exit(1);
      }
+
      recvline[n++] = 0;
-     fprintf(out, "%s\n", recvline);
+     fprintf(out, "%s", recvline);
    }
+
+   fclose(in);
+   fclose(out);
 
    exit(0);
 }

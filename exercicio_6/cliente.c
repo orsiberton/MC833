@@ -31,11 +31,6 @@ int main(int argc, char **argv) {
     while (fgets(input, MAXLINE, stdin) != NULL) {
      write(sockfd, input, strlen(input));
 
-     // termina execução do cliente caso o cliente queira
-     if (isExit(input)) {
-       break;
-     }
-
      // le o que foi recebido através do socket e imprime o conteúdo
      if ((n = read(sockfd, recvline, MAXLINE)) < 0) {
        perror("read error");

@@ -4,16 +4,12 @@ int main(int argc, char **argv) {
    int    sockfd, n;
    char   recvline[MAXLINE], input[MAXLINE];;
    struct sockaddr_in servaddr;
-   FILE *in, *out;
 
    // verifica se o host e a porta foram passados
-   if (argc != 5) {
-      perror("Host/Porta/Entrada/Saida nao informados!/n");
+   if (argc != 3) {
+      perror("Host/Porta nao informados!/n");
       exit(1);
    }
-
-   in = fopen(argv[3], "r");
-   out = fopen(argv[4], "w");
 
    // cria um socket TCP
    sockfd = Socket(AF_INET, SOCK_STREAM, 0);
@@ -32,7 +28,7 @@ int main(int argc, char **argv) {
    // abre a conexão com o servidor
    Connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
-    while (fgets(input, MAXLINE, in) != NULL) {
+    while (fgets(input, MAXLINE, stdin) != NULL) {
      write(sockfd, input, strlen(input));
 
      // termina execução do cliente caso o cliente queira
@@ -47,12 +43,8 @@ int main(int argc, char **argv) {
      }
 
      recvline[n++] = 0;
-     fprintf(out, "%s", recvline);
+     printf("%s", recvline);
    }
-
-   fclose(in);
-   fclose(out);
 
    exit(0);
 }
-

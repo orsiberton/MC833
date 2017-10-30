@@ -8,8 +8,8 @@ int main (int argc, char **argv) {
    fd_set rset;
 
    // verifica se o nome do arquivo foi passado por parametro
-   if (argc != 3) {
-      perror("Porta/Log nao informado!");
+   if (argc != 2) {
+      perror("Porta nao informado!");
       exit(0);
    }
 
@@ -53,10 +53,8 @@ int main (int argc, char **argv) {
     		    exit(1);
         }
 
-    		if (send(new_socket, buf, strlen(buf), 0) != strlen(buf) ) {
-    	     perror("send error");
-           exit(1);
-    		}
+        write(new_socket, buf, strlen(buf));
+        memset(buf, 0, sizeof(buf));
     	}
    }
 

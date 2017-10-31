@@ -1,11 +1,12 @@
 #include "my_socket_api.h"
 
 int main (int argc, char **argv) {
-   int listenfd, n, port, new_socket, activity;
-   unsigned int clientaddr_len, maxfdp1;
+   int listenfd, connfd, activity, nread;
+   unsigned int clientaddr_len;
    struct sockaddr_in servaddr, clientaddr;
    char buf[MAXLINE];
-   fd_set rset;
+   fd_set selectfd;
+	 fd_set selectfd_aux;
 
    // verifica se o nome do arquivo foi passado por parametro
    if (argc != 2) {
@@ -13,15 +14,13 @@ int main (int argc, char **argv) {
       exit(0);
    }
 
-   port = atoi(argv[1]);
-
    // cria um socket TCP
    listenfd = Socket(AF_INET, SOCK_STREAM, 0);
 
-   //type of socket created
+   // cria o socket TCP
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = INADDR_ANY;
-    servaddr.sin_port = htons(port);
+    servaddr.sin_port = htons(atoi(argv[1]));
 
    // faz o bind do socket TCP com o host:porta escolhidos
    Bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
@@ -29,36 +28,38 @@ int main (int argc, char **argv) {
    // ativa a socket para começar a receber conexões
    Listen(listenfd, LISTENQ);
 
-   FD_ZERO(&rset);
-
+   FD_ZERO(&selectfd);
+   FD_SET(listenfd, &selectfd);
    // espera por conexões de clientes indefinidamente
    for ( ; ; ) {
-      FD_SET(listenfd, &rset);
-      maxfdp1 = listenfd;
-      activity = select(maxfdp1 + 1, &rset , NULL , NULL , NULL);
+     selectfd_aux = selectfd;
+     activity = Select(FD_SETSIZE, &selectfd_aux, NULL, NULL, NULL);
 
-      if ((activity < 0) && (errno!=EINTR)) {
-          perror("select error");
-          exit(1);
-      }
+     // se houve uma conexao a flag é setada e a conexao eh aceita
+     if (FD_ISSET(listenfd, &selectfd_aux)) {
+       activity--;
+       clientaddr_len = sizeof(clientaddr);
+       connfd = Accept(listenfd, (struct sockaddr *) &clientaddr, &clientaddr_len);
+       FD_SET(connfd, &selectfd);
+     }
 
-      if ((new_socket = accept(listenfd, (struct sockaddr *)&clientaddr, (socklen_t*)&clientaddr_len))<0){
-	       perror("accept error");
-	       exit(1);
-      }
+     // se a flag estiver setada
+     if (FD_ISSET(connfd, &selectfd_aux)) {
+       activity--;
 
-    	while (FD_ISSET(listenfd, &rset)) {
-    		if ((n = read(new_socket, buf, MAXLINE)) < 0) {
-    		    perror("read error");
-    		    exit(1);
-        }
+       // le a linha e manda de volta para o cliente
+       nread = read(connfd, buf, MAXLINE);
+       write(connfd, buf, nread);
 
-        write(new_socket, buf, strlen(buf));
-        memset(buf, 0, sizeof(buf));
-    	}
+       // caso não tenha nada para ler, limpa
+       if (nread == 0) {
+         close(connfd);
+         FD_CLR(connfd, &selectfd);
+       }
+     }
    }
 
-   // fecha arquivo de log
+   // fecha o socket de listen
    close(listenfd);
 
    return(0);

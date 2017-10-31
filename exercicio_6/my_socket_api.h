@@ -41,4 +41,4 @@ void FPrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int 
 void PrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
 void FPrintClientDataClose(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len, FILE *f);
 void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort);
-
+int Select(int nfds, fd_set *restrict readfds, fd_set *restrict writefds, fd_set *restrict errorfds, struct timeval *restrict timeout);

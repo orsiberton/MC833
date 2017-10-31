@@ -1,9 +1,10 @@
 #include "my_socket_api.h"
 
 int main(int argc, char **argv) {
-   int    sockfd, n;
-   char   recvline[MAXLINE], input[MAXLINE];;
+   int    sockfd, n, data_sent = 0, data_received = 0;
+   char   recvline[MAXLINE], input[MAXLINE];
    struct sockaddr_in servaddr;
+   fd_set selectfd;
 
    // verifica se o host e a porta foram passados
    if (argc != 3) {
@@ -28,18 +29,41 @@ int main(int argc, char **argv) {
    // abre a conexão com o servidor
    Connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
-    while (fgets(input, MAXLINE, stdin) != NULL) {
-     write(sockfd, input, strlen(input));
+   FD_ZERO(&selectfd);
 
-     // le o que foi recebido através do socket e imprime o conteúdo
-     if ((n = read(sockfd, recvline, MAXLINE)) < 0) {
-       perror("read error");
-       exit(1);
+   // le entrada do cliente
+   for ( ; ; ) {
+     // faz o set no stdin e no socket
+     FD_SET(fileno(stdin), &selectfd);
+     FD_SET(sockfd, &selectfd);
+
+     // faz o select em selectfd
+     Select(FD_SETSIZE, &selectfd, NULL, NULL, NULL);
+
+     // verifica se o stdin foi setado
+     if (FD_ISSET(fileno(stdin), &selectfd)) {
+       // le do servidor
+       n = read(fileno(stdin), recvline, MAXLINE);
+
+       // caso algo tenha sido enviado
+       if (n > 0) {
+         data_sent =+ n;
+         write(sockfd, recvline, n);
+       }
      }
 
-     recvline[n++] = 0;
-     printf("%s", recvline);
+     // verifica se o socket foi setado
+     if (FD_ISSET(sockfd, &selectfd)) {
+       n = read(sockfd, input, MAXLINE);
+       data_received =+ n;
+       write(fileno(stdout), input, n);
+     }
+
+     // caso todos os bytes forem enviados, encerra o cliente
+     if (data_received == data_sent) {
+       break;
+     }
    }
 
-   exit(0);
+   return(0);
 }

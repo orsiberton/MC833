@@ -1,12 +1,10 @@
 #include "my_socket_api.h"
 
 int main (int argc, char **argv) {
-   int listenfd, connfd, n;
+   int listenfd, n;
    unsigned int clientaddr_len;
-   struct sockaddr_in servaddr, clientaddr;
+   struct sockaddr clientaddr;
    char buf[MAXLINE];
-   char clientName[INET_ADDRSTRLEN];
-   pid_t pid;
 
    // verifica se a porta foi passado por parametro
    if (argc != 2) {
@@ -16,6 +14,10 @@ int main (int argc, char **argv) {
 
    // cria um socket UDP
    listenfd = Socket(AF_INET, SOCK_DGRAM, 0);
+
+   for(;;){
+      n = recvfrom(listenfd, buf, MAXLINE, 0, &clientaddr, &clientaddr_len);
+   }
 
    return(0);
 }

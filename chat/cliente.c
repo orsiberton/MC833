@@ -5,9 +5,9 @@ int main(int argc, char **argv) {
    char   recvline[MAXLINE], input[MAXLINE];
    struct sockaddr_in servaddr;
 
-   // verifica se o host e a porta foram passados
-   if (argc != 3) {
-      perror("Host/Porta nao informados!");
+   // verifica se o host foi passado
+   if (argc != 2) {
+      perror("Host do servidor nao informado!");
       exit(1);
    }
 
@@ -16,7 +16,6 @@ int main(int argc, char **argv) {
 
    // socket reutiliza o endereço IP
    Setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
-
 
    exit(0);
 }

@@ -1,7 +1,7 @@
 #include "my_socket_api.h"
 
 int main(int argc, char **argv) {
-   int    sockfd, n;
+   int    sockfd, n, optval = 1;
    char   recvline[MAXLINE], input[MAXLINE];
    struct sockaddr_in servaddr;
 

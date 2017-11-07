@@ -62,7 +62,7 @@ int Accept(int socket, struct sockaddr *sockaddr, socklen_t *sockaddr_len) {
 void Setsockopt(int socket, int level, int optname, const void *optval, socklen_t optlen) {
   if (setsockopt(socket, level, optname, optval, optlen) < 0) {
     perror("Setsockopt error");
-    exit(1)
+    exit(1);
   }
 }
 

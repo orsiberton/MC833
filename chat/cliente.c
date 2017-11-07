@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv) {
    int    sockfd, n;
-   char   recvline[MAXLINE], input[MAXLINE];;
+   char   recvline[MAXLINE], input[MAXLINE];
    struct sockaddr_in servaddr;
 
    // verifica se o host e a porta foram passados
@@ -12,7 +12,10 @@ int main(int argc, char **argv) {
    }
 
    // cria um socket UDP
-   sockfd = Socket(AF_INET, SOCK_DGRAM, 0);
+   sockfd = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+   // socket reutiliza o endereço IP
+   Setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
 
 
    exit(0);

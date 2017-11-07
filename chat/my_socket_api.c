@@ -57,6 +57,62 @@ int Accept(int socket, struct sockaddr *sockaddr, socklen_t *sockaddr_len) {
 }
 
 /*
+  Função auxiliar para setar opções no socket
+*/
+void Setsockopt(int socket, int level, int optname, const void *optval, socklen_t optlen) {
+  if (setsockopt(socket, level, optname, optval, optlen) < 0) {
+    perror("Setsockopt error");
+    exit(1)
+  }
+}
+
+/*
+  Função auxiliar para enviar dados do cliente para o servidor
+*/
+void Send(int socket, const void *string, size_t nbytes, int flags) {
+  if (send(socket, string, nbytes, flags) != nbytes) {
+    perror("Send error");
+    exit(1);
+  }
+}
+
+/*
+  Função auxiliar para enviar dados do servidor para os clientes
+*/
+void Sendto(int socket, const void *string, size_t nbytes, int flags, const struct sockaddr *socket_to, socklen_t socket_len) {
+  if (sendto(socket, string, nbytes, flags, socket_to, socket_len) != nbytes) {
+    perror("Sendto error");
+    exit(1);
+  }
+}
+
+/*
+  Função auxiliar para receber dados do servidor
+*/
+int Recv(int socket, void *string, size_t nbytes, int flags) {
+  int n;
+
+  if ((n = recv(socket, string, nbytes, flags)) < 0) {
+    perror("Recv error");
+  }
+
+  return n;
+}
+
+/*
+  Função auxiliar para receber dados do servidor para o cliente
+*/
+int Recvfrom(int socket, void *string, size_t nbytes, int flags, struct sockaddr *socket_to, socklen_t *socket_len) {
+  int n;
+
+  if ((n = recvfrom(socket, string, nbytes, flags, socket_to, socket_len)) < 0) {
+    perror("Recvfrom error");
+  }
+
+  return n;
+}
+
+/*
   Função auxiliar para sair da conexão
 */
 bool isExit(const char *message) {

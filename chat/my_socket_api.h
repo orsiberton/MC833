@@ -29,6 +29,11 @@ void Connect(int socket, const struct sockaddr *sockaddr, socklen_t sockaddr_len
 void Bind(int socket, const struct sockaddr *sockaddr, socklen_t sockaddr_len);
 void Listen(int socket, int queue_size);
 int Accept(int socket, struct sockaddr *sockaddr, socklen_t *sockaddr_len);
+void Setsockopt(int fd, int level, int optname, const void *optval, socklen_t optlen);
+void Send(int socket, const void *string, size_t nbytes, int flags);
+void Sendto(int socket, const void *string, size_t nbytes, int flags, const struct sockaddr *socket_to, socklen_t socket_len);
+int Recv(int socket, void *string, size_t nbytes, int flags);
+int Recvfrom(int socket, void *string, size_t nbytes, int flags, struct sockaddr *socket_to, socklen_t *socket_len);
 
 /*
   Funções auxiliares

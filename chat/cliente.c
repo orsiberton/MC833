@@ -5,9 +5,9 @@ int main(int argc, char **argv) {
    char   recvline[MAXLINE], input[MAXLINE];;
    struct sockaddr_in servaddr;
 
-   // verifica se o host e a porta foram passados
-   if (argc != 3) {
-      perror("Host/Porta do servidor nao informados!");
+   // verifica se o host foi passado
+   if (argc != 2) {
+      perror("Host do servidor nao informado!");
       exit(1);
    }
 

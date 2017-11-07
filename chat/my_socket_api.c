@@ -1,19 +1,5 @@
 #include "my_socket_api.h"
 
-static const char CLIENT_JOIN[] = "join";
-static const char CLIENT_JOIN_OK[] = "join_ok";
-static const char CLIENT_JOIN_DENIED[] = "join_denied";
-
-static const char CLIENT_SEND[] = "client_send";
-static const char CLIENT_SEND_OK[] = "client_send_ok";
-static const char CLIENT_SEND_DENIED[] = "client_send_denied";
-
-static const char SERVER_SEND[] = "server_send";
-static const char SERVER_SEND_OK[] = "server_send_ok";
-
-static const char CLIENT_LEAVING[] = "leaving";
-static const char CLIENT_LEAVING_OK[] = "leaving_ok";
-
 /*
   Função para criação de sockets
 */

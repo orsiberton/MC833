@@ -22,6 +22,27 @@ typedef enum {
 } bool;
 
 /*
+  Constantes
+*/
+static const char CLIENT_JOIN[] = "join";
+static const char CLIENT_JOIN_OK[] = "join_ok";
+static const char CLIENT_JOIN_DENIED[] = "join_denied";
+
+static const char CLIENT_SEND[] = "client_send";
+static const char CLIENT_SEND_OK[] = "client_send_ok";
+static const char CLIENT_SEND_DENIED[] = "client_send_denied";
+
+static const char SERVER_SEND[] = "server_send";
+static const char SERVER_SEND_OK[] = "server_send_ok";
+
+static const char CLIENT_LEAVING[] = "leaving";
+static const char CLIENT_LEAVING_OK[] = "leaving_ok";
+
+static const char SEPARATOR[] = "*&$#@!";
+
+static const unsigned int CHAT_PORT = 25713;
+
+/*
   Funções que abstraem a interface de sockets
 */
 int Socket(int family, int type, int flags);

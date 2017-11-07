@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <string.h>
 
 #define MAXLINE 4096
 #define LISTENQ 5
@@ -41,6 +42,8 @@ static const char CLIENT_LEAVING_OK[] = "leaving_ok";
 static const char SEPARATOR[] = "*&$#@!";
 
 static const unsigned int CHAT_PORT = 25713;
+
+static const unsigned int MAX_CLIENTS = 128;
 
 /*
   Funções que abstraem a interface de sockets

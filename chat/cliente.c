@@ -7,13 +7,12 @@ int main(int argc, char **argv) {
 
    // verifica se o host e a porta foram passados
    if (argc != 3) {
-      perror("Host/Porta nao informados!");
+      perror("Host/Porta do servidor nao informados!");
       exit(1);
    }
 
    // cria um socket UDP
    sockfd = Socket(AF_INET, SOCK_DGRAM, 0);
-
 
    exit(0);
 }

@@ -64,5 +64,6 @@ int Recvfrom(int socket, void *string, size_t nbytes, int flags, struct sockaddr
 */
 bool isExit(const char *message);
 pid_t Fork();
+int Select(int nfds, fd_set *restrict readfds, fd_set *restrict writefds, fd_set *restrict errorfds, struct timeval *restrict timeout);
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
 void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort);

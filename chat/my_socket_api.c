@@ -137,6 +137,20 @@ pid_t Fork() {
 }
 
 /*
+  Função auxiliar para realizar o select e tratar o erro caso necessario
+*/
+int Select(int nfds, fd_set *restrict readfds, fd_set *restrict writefds, fd_set *restrict errorfds, struct timeval *restrict timeout) {
+  int n;
+
+  if ((n = select(nfds, readfds, writefds, errorfds, timeout)) < 0) {
+    perror("Select error");
+    return 1;
+  }
+
+  return n;
+}
+
+/*
   Função auxiliar que imprime os dados do socket cliente
 */
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len) {

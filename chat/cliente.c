@@ -65,11 +65,11 @@ int main(int argc, char **argv) {
    char   recvline[MAXLINE], input[MAXLINE];
    pthread_t receiver;
 
-   // verifica se o host foi passado
-   if (argc != 2) {
-      perror("Host do servidor nao informado!");
-      exit(1);
-   }
+  // verifica se o host foi passado
+  if (argc != 2) {
+    perror("Host do servidor nao informado!");
+    exit(1);
+  }
 
    servaddr.sin_family = AF_INET;
    servaddr.sin_port = htons(CHAT_PORT);
@@ -104,6 +104,6 @@ int main(int argc, char **argv) {
          break;
       }
    }
-
-   exit(0);
+   
+  exit(0);
 }

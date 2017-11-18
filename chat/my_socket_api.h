@@ -11,16 +11,10 @@
 #include <netinet/in.h>
 #include <string.h>
 
+using namespace std;
+
 #define MAXLINE 4096
 #define LISTENQ 5
-
-/*
-  Define um typo booleano
-*/
-typedef enum {
-  FALSE = 0,
-  TRUE = 1
-} bool;
 
 /*
   Constantes
@@ -64,6 +58,6 @@ int Recvfrom(int socket, void *string, size_t nbytes, int flags, struct sockaddr
 */
 bool isExit(const char *message);
 pid_t Fork();
-int Select(int nfds, fd_set *restrict readfds, fd_set *restrict writefds, fd_set *restrict errorfds, struct timeval *restrict timeout);
+int Select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * errorfds, struct timeval * timeout);
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
 void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort);

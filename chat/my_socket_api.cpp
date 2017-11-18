@@ -70,7 +70,7 @@ void Setsockopt(int socket, int level, int optname, const void *optval, socklen_
   Função auxiliar para enviar dados do cliente para o servidor
 */
 void Send(int socket, const void *string, size_t nbytes, int flags) {
-  if (send(socket, string, nbytes, flags) != nbytes) {
+  if (send(socket, string, nbytes, flags) != (unsigned) nbytes) {
     perror("Send error");
     exit(1);
   }
@@ -80,7 +80,7 @@ void Send(int socket, const void *string, size_t nbytes, int flags) {
   Função auxiliar para enviar dados do servidor para os clientes
 */
 void Sendto(int socket, const void *string, size_t nbytes, int flags, const struct sockaddr *socket_to, socklen_t socket_len) {
-  if (sendto(socket, string, nbytes, flags, socket_to, socket_len) != nbytes) {
+  if (sendto(socket, string, nbytes, flags, socket_to, socket_len) != (unsigned) nbytes) {
     perror("Sendto error");
     exit(1);
   }
@@ -117,10 +117,10 @@ int Recvfrom(int socket, void *string, size_t nbytes, int flags, struct sockaddr
 */
 bool isExit(const char *message) {
   if (strncmp(message, "exit\n", strlen(message)) == 0) {
-    return TRUE;
+    return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 /*
@@ -139,7 +139,7 @@ pid_t Fork() {
 /*
   Função auxiliar para realizar o select e tratar o erro caso necessario
 */
-int Select(int nfds, fd_set *restrict readfds, fd_set *restrict writefds, fd_set *restrict errorfds, struct timeval *restrict timeout) {
+int Select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * errorfds, struct timeval * timeout) {
   int n;
 
   if ((n = select(nfds, readfds, writefds, errorfds, timeout)) < 0) {

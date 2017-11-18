@@ -61,3 +61,4 @@ pid_t Fork();
 int Select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * errorfds, struct timeval * timeout);
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
 void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort);
+bool isValidIP(char *ip);

@@ -5,6 +5,7 @@ int main(int argc, char **argv) {
   char data_received[MAXLINE], user_input[MAXLINE], nickname[100];
   struct sockaddr_in server_udp_socket;
   fd_set selectfd;
+  struct hostent *server_host;
 
   // verifica se o host e a porta foram passados
   if (argc != 3) {
@@ -32,8 +33,15 @@ int main(int argc, char **argv) {
   // configura os parâmetros da conexão
   bzero( & server_udp_socket, sizeof(server_udp_socket));
   server_udp_socket.sin_family = AF_INET;
-  server_udp_socket.sin_addr.s_addr = inet_addr(argv[1]);
   server_udp_socket.sin_port = htons(atoi(argv[2]));
+
+  // Faz o set fo host por IP ou nome
+  if (isValidIP(argv[1])) {
+    server_udp_socket.sin_addr.s_addr = inet_addr(argv[1]);
+  } else {
+    server_host = gethostbyname(argv[1]);
+    bcopy((char *) server_host->h_addr, (char *) &server_udp_socket.sin_addr.s_addr, server_host->h_length);
+  }
 
   // abre a conexão com o servidor
   Connect(server_udp_socket_number, (struct sockaddr * ) &server_udp_socket, sizeof(server_udp_socket));

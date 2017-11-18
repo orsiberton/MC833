@@ -176,3 +176,12 @@ void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, 
   printf("Endereco IP local do socket: %s\n", localHost);
   printf("Porta local do socket: %s\n", localPort);
 }
+
+/*
+  Função auxiliar que checa se a string passada é um IP válido
+*/
+bool isValidIP(char *ip) {
+    struct sockaddr_in socket;
+    int result = inet_pton(AF_INET, ip, &(socket.sin_addr));
+    return result != 0;
+}

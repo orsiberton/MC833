@@ -1,109 +1,65 @@
 #include "my_socket_api.h"
-#include <pthread.h>
-
-static const char EXIT_COMMAND[] = "exit";
-
-int sockfd;
-struct sockaddr_in servaddr;
-
-void *receiveMessages(){
-   char recvline[MAXLINE];
-
-   while(TRUE){
-      int n = recvfrom(sockfd, recvline, MAXLINE, 0, &servaddr, sizeof(servaddr));
-
-      if(n > 0){
-         if(strstr(recvline, SERVER_SEND) == 0){
-            // TODO fazer parse do recvline separando SERVER_SEND, remetente e mensagem
-            printf("%s\n", recvline);
-
-            while (sendto(sockfd, SERVER_SEND_OK, sizeof(SERVER_SEND_OK), 0, (struct sockaddr*) &servaddr, sizeof(servaddr)) == -1){
-               // try to send until successful
-            }
-         } else if(strstr(recvline, CLIENT_SEND_DENIED) == 0){
-            printf("--Mensagem nao enviada; tente novamente.--\n");
-         }
-         
-      }
-
-      sleep(5);
-   }
-}
-
-// realiza uma iteracao do chat
-// retorna 0 caso o chat deva ser encerrado
-// retorna 1 caso o chat deva continuar
-int chat(){
-   char input[MAXLINE];
-
-   fgets(input, MAXLINE, stdin);
-
-   if(strstr(input, EXIT_COMMAND) == 0){
-      return 0;
-   }
-
-   // TODO montar string a ser enviada, trocando CLIENT_SEND abaixo por uma string composta
-   // por CLIENT_SEND, destinatario e mensagem
-
-   while (sendto(sockfd, CLIENT_SEND, sizeof(CLIENT_SEND), 0, (struct sockaddr*) &servaddr, sizeof(servaddr)) == -1){
-      // try to send until successful
-   }
-
-   return 1;
-}
-
-// realiza processo de saida do chat
-void exitChat(){
-   while (sendto(sockfd, CLIENT_LEAVING, sizeof(CLIENT_LEAVING), 0, (struct sockaddr*) &servaddr, sizeof(servaddr)) == -1){
-      // try to exit chat until successful
-   }
-
-   exitChat(sockfd, servaddr); // repeat until success
-}
 
 int main(int argc, char **argv) {
-   char   recvline[MAXLINE], input[MAXLINE];
-   pthread_t receiver;
+  int server_udp_socket_number, bytes_number, option_udp = 1;
+  char data_received[MAXLINE], user_input[MAXLINE];
+  struct sockaddr_in server_udp_socket;
+  fd_set selectfd;
 
-  // verifica se o host foi passado
-  if (argc != 2) {
-    perror("Host do servidor nao informado!");
+  // verifica se o host e a porta foram passados
+  if (argc != 3) {
+    perror("Host/Porta nao informados!/n");
     exit(1);
   }
 
-   servaddr.sin_family = AF_INET;
-   servaddr.sin_port = htons(CHAT_PORT);
-   servaddr.sin_addr.s_addr = inet_addr(argv[1]);
+  // cria um socket UDP
+  server_udp_socket_number = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  Setsockopt(server_udp_socket_number, SOL_SOCKET, SO_REUSEADDR, & option_udp, sizeof(int));
 
-   // cria um socket UDP
-   sockfd = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  // configura os parâmetros da conexão
+  bzero( & server_udp_socket, sizeof(server_udp_socket));
+  server_udp_socket.sin_family = AF_INET;
+  server_udp_socket.sin_addr.s_addr = inet_addr(argv[1]);
+  server_udp_socket.sin_port = htons(atoi(argv[2]));
 
-   Bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr) );
+  // abre a conexão com o servidor
+  Connect(server_udp_socket_number, (struct sockaddr * ) &server_udp_socket, sizeof(server_udp_socket));
 
-   // socket reutiliza o endereço IP
-   //Setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
+  FD_ZERO( & selectfd);
 
-   Connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
+  // le entrada do cliente
+  for (;;) {
+    // faz o set no stdin e no socket
+    FD_SET(fileno(stdin), &selectfd);
+    FD_SET(server_udp_socket_number, &selectfd);
 
-   while (sendto(sockfd, CLIENT_JOIN, sizeof(CLIENT_JOIN), 0, (struct sockaddr*) &servaddr, sizeof(servaddr)) == -1){
-      // try to join chat until successful
-   }
+    // faz o select em selectfd
+    Select(FD_SETSIZE, &selectfd, NULL, NULL, NULL);
 
-   // client joined
+    // verifica se o stdin foi setado
+    if (FD_ISSET(fileno(stdin), &selectfd)) {
+      // le do stdin
+      bytes_number = read(fileno(stdin), user_input, MAXLINE);
 
-   // TODO pegar a lista de clientes disponiveis para bater papo
-   // TODO pedir para usuario selecionar cliente e informar servidor
+      // caso algo tenha sido lido
+      if (bytes_number > 0) {
+        Send(server_udp_socket_number, user_input, bytes_number, 0);
 
-   pthread_create(&receiver, NULL, receiveMessages, NULL);
-   pthread_join(receiver, NULL);
+        // termina execução do cliente caso o cliente queira
+        if (isExit(user_input)) {
+          break;
+        }
 
-   while(TRUE){
-      if( !chat(sockfd, servaddr) ){
-         pthread_cancel(receiver);
-         exitChat(sockfd, servaddr);
-         break;
+        memset(user_input, 0, sizeof(user_input));
       }
-   }
-   
-  exit(0);
+    }
+
+    // verifica se o socket foi setado
+    if (FD_ISSET(server_udp_socket_number, &selectfd)) {
+      bytes_number = Recv(server_udp_socket_number, data_received, MAXLINE, 0);
+      write(fileno(stdout), data_received, bytes_number);
+    }
+  }
+
+  return 0;
 }

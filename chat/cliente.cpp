@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv) {
   int server_udp_socket_number, bytes_number, option_udp = 1;
-  char data_received[MAXLINE], user_input[MAXLINE];
+  char data_received[MAXLINE], user_input[MAXLINE], nickname[100];
   struct sockaddr_in server_udp_socket;
   fd_set selectfd;
 
@@ -11,6 +11,19 @@ int main(int argc, char **argv) {
     perror("Host/Porta nao informados!/n");
     exit(1);
   }
+
+  printf("\nMC833 - Chat\n");
+  printf("Instruções do chat:\n");
+  printf(" 1) Para exibir a lista de usuários online: list\n");
+  printf(" 2) Para enviar uma mensagem: send <nickname> <message>\n");
+  printf(" 3) Para transferir um arquivo: send-file <nickname> <file name>\n");
+  printf("  3.1) Arquivos enviados para você serão salvos em uma pasta chama /chat-tmp-files\n");
+  printf(" 4) Para se desconectar do chat: exit\n\n");
+
+  printf("Entre com o seu nickname: \n");
+  scanf("%s", nickname);
+
+  printf("Bem-vindo %s!\n", nickname);
 
   // cria um socket UDP
   server_udp_socket_number = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);

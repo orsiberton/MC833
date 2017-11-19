@@ -46,6 +46,11 @@ int main(int argc, char **argv) {
   // abre a conexão com o servidor
   Connect(server_udp_socket_number, (struct sockaddr * ) &server_udp_socket, sizeof(server_udp_socket));
 
+  // cliente pede para se registrar
+  string register_command = "connect-client ";
+  register_command += nickname;
+  Send(server_udp_socket_number, register_command.c_str(), strlen(register_command.c_str()), 0);
+
   FD_ZERO( & selectfd);
 
   // le entrada do cliente

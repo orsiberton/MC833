@@ -9,12 +9,23 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <string.h>
+//===============================
+#include <string>
+#include <vector>
 
 using namespace std;
 
 #define MAXLINE 4096
 #define LISTENQ 5
+
+class Client {
+  public:
+    string nickname;
+    int socket_number;
+    string host;
+    int port_number;
+    struct sockaddr_in client_udp_socket;
+};
 
 /*
   Constantes
@@ -62,3 +73,4 @@ int Select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * errorfds, str
 void PrintClientData(const struct sockaddr_in *sockaddr, char *clientName, int clientName_len);
 void PrintData(int socket, const struct sockaddr_in *sockaddr, char *localHost, char *localPort);
 bool isValidIP(char *ip);
+bool startsWith(const char *pre, const char *str);

@@ -185,3 +185,11 @@ bool isValidIP(char *ip) {
     int result = inet_pton(AF_INET, ip, &(socket.sin_addr));
     return result != 0;
 }
+
+/*
+  Função auxiliar que verifica se uma string começa com outra
+*/
+bool startsWith(const char *pre, const char *str) {
+    size_t lenpre = strlen(pre), lenstr = strlen(str);
+    return lenstr < lenpre ? false : strncmp(pre, str, lenpre) == 0;
+}

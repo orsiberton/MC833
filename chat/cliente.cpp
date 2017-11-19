@@ -8,8 +8,8 @@ int main(int argc, char **argv) {
   struct hostent *server_host;
 
   // verifica se o host e a porta foram passados
-  if (argc != 3) {
-    perror("Host/Porta nao informados!/n");
+  if (argc != 2) {
+    perror("Host nao informado!/n");
     exit(1);
   }
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
   // configura os parâmetros da conexão
   bzero( & server_udp_socket, sizeof(server_udp_socket));
   server_udp_socket.sin_family = AF_INET;
-  server_udp_socket.sin_port = htons(atoi(argv[2]));
+  server_udp_socket.sin_port = htons(CHAT_PORT);
 
   // Faz o set fo host por IP ou nome
   if (isValidIP(argv[1])) {

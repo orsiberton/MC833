@@ -1,7 +1,6 @@
 #include "my_socket_api.h"
 
 int main(int argc, char **argv) {
-  int bytes_received;
   int option_udp = 1;
   int client_udp_socket_number;
   unsigned int client_udp_socket_size;
@@ -10,19 +9,13 @@ int main(int argc, char **argv) {
   char client_name[INET_ADDRSTRLEN];
   vector<Client> client_list;
 
-  // verifica se a porta foi passado por parametro
-  if (argc != 2) {
-    perror("Porta nao informada!");
-    exit(1);
-  }
-
   // cria um socket UDP
   client_udp_socket_number = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   Setsockopt(client_udp_socket_number, SOL_SOCKET, SO_REUSEADDR, &option_udp, sizeof(int));
 
   memset( & server_udp_socket, 0, sizeof(server_udp_socket));
   server_udp_socket.sin_addr.s_addr = INADDR_ANY;
-  server_udp_socket.sin_port = htons(atoi(argv[1]));
+  server_udp_socket.sin_port = htons(CHAT_PORT);
   server_udp_socket.sin_family = AF_INET;
 
   // realiza o bind dos sockets cliente e servidor
@@ -32,7 +25,7 @@ int main(int argc, char **argv) {
   for (;;) {
     // recebe a mensagem dos clientes
     client_udp_socket_size = sizeof(client_udp_socket);
-    bytes_received = Recvfrom(client_udp_socket_number, data_received, sizeof(data_received), 0, (struct sockaddr * ) &client_udp_socket, &client_udp_socket_size);
+    Recvfrom(client_udp_socket_number, data_received, sizeof(data_received), 0, (struct sockaddr * ) &client_udp_socket, &client_udp_socket_size);
 
     inet_ntop(AF_INET, &client_udp_socket.sin_addr.s_addr, client_name, sizeof(client_name));
     printf("Cliente(%d/%s/%d): \n", client_udp_socket_number, client_name, ntohs(client_udp_socket.sin_port));
@@ -67,13 +60,22 @@ int main(int argc, char **argv) {
       }
     } else if (startsWith("send", data_received)) {
       // handler para mandar mensagem de um cliente para o outro
-      printf("Cliente tentando enviar uma mensagem\n");
-      char nickname_temp[100];
+      char receiver_nickname[100];
       char client_message[MAXLINE];
-      sscanf(data_received, "send %s %[^\t]", nickname_temp, client_message);
+      string current_client_nickname;
+      sscanf(data_received, "send %s %[^\t]", receiver_nickname, client_message);
+
+      // faz a iteração para descobrir o nickname de quem está mandando a mensagem
+      for(vector<Client>::iterator it = client_list.begin(); it != client_list.end(); ++it) {
+        Client& client = *it;
+        if (strcmp(client.host.c_str(), client_name) == 0 && client.port_number == ntohs(client_udp_socket.sin_port)) {
+          current_client_nickname = client.nickname;
+          break;
+        }
+      }
 
       // monta a mensagem para o cliente destino
-      string message = nickname_temp;
+      string message = current_client_nickname;
       message += ": ";
       message += client_message;
 
@@ -81,8 +83,7 @@ int main(int argc, char **argv) {
       bool message_sent = false;
       for(vector<Client>::iterator it = client_list.begin(); it != client_list.end(); ++it) {
         Client& client = *it;
-        if (strcmp(client.nickname.c_str(), nickname_temp) == 0) {
-          printf("Mandando mensagem\n");
+        if (strcmp(client.nickname.c_str(), receiver_nickname) == 0) {
           Sendto(client.socket_number, message.c_str(), strlen(message.c_str()), 0, (struct sockaddr * ) &client.client_udp_socket, client_udp_socket_size);
           message_sent = true;
         }

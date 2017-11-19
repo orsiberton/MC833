@@ -47,6 +47,7 @@ static const char CLIENT_LEAVING_OK[] = "leaving_ok";
 static const char SEPARATOR[] = "*&$#@!";
 
 static const unsigned int CHAT_PORT = 25713;
+static const unsigned int TRANSFER_FILE_PORT = 25720;
 
 static const unsigned int MAX_CLIENTS = 128;
 

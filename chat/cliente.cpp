@@ -13,6 +13,9 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+  // comando para criar a pasta que ficarão os arquivos transferidos
+  system("mkdir -p chat-tmp-files");
+
   printf("\nMC833 - Chat\n");
   printf("Instruções do chat:\n");
   printf(" 1) Para exibir a lista de usuários online: list\n");

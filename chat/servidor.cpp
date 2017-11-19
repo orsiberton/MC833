@@ -28,11 +28,11 @@ int main(int argc, char **argv) {
 
   // espera por mensagens de clientes
   for (;;) {
-    /* Recebe mensagem UPD: */
+    // recebe a mensagem dos clientes
     client_udp_socket_size = sizeof(client_udp_socket);
     bytes_received = Recvfrom(client_udp_socket_number, data_received, sizeof(data_received), 0, (struct sockaddr * ) &client_udp_socket, &client_udp_socket_size);
 
-    /* Envia o eco: */
+    // envia o echo para os clientes
     Sendto(client_udp_socket_number, data_received, bytes_received, 0, (struct sockaddr * ) &client_udp_socket, client_udp_socket_size);
     memset(data_received, 0, sizeof(data_received));
   }

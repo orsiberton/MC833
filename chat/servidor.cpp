@@ -31,10 +31,6 @@ int main(int argc, char **argv) {
     printf("Cliente(%d/%s/%d): \n", client_udp_socket_number, client_name, ntohs(client_udp_socket.sin_port));
     printf("%s\n", data_received);
 
-    // if (data_received[strlen(data_received) - 1] == '\n') {
-    //   data_received[strlen(data_received) - 1] = '\0';
-    // }
-
     // handler para conexão de novo cliente
     if (startsWith("connect-client", data_received)) {
       char nickname_temp[100];
@@ -93,9 +89,37 @@ int main(int argc, char **argv) {
         message = "Falha ao enviar a mensagem: Cliente não encontrado!\n";
         Sendto(client_udp_socket_number, message.c_str(), strlen(message.c_str()), 0, (struct sockaddr * ) &client_udp_socket, client_udp_socket_size);
       }
-    } else if (startsWith("send-file", data_received)) {
-      // handler para enviar IP e porta para o cliente, assim o cliente abrirá a conexão TCP
+    } else if (startsWith("transfer-file", data_received)) {
       // TODO
+      // handler para enviar IP e porta para o cliente, assim o cliente abrirá a conexão TCP
+      char receiver_nickname[100];
+      char file_name[MAXLINE];
+      sscanf(data_received, "transfer-file %s %[^\t\n]", receiver_nickname, file_name);
+
+      printf("teste %s %s\n", receiver_nickname, file_name);
+
+      string message = "open-connection-to-transfer-file ";
+      message += file_name;
+
+      // tenta enviar a mensagem para o cliente destino
+      bool message_sent = false;
+      for(vector<Client>::iterator it = client_list.begin(); it != client_list.end(); ++it) {
+        Client& client = *it;
+        if (strcmp(client.nickname.c_str(), receiver_nickname) == 0) {
+          // notifica o cliente destino para abrir a conexão
+          Sendto(client.socket_number, message.c_str(), strlen(message.c_str()), 0, (struct sockaddr * ) &client.client_udp_socket, client_udp_socket_size);
+
+          // notifica o cliente o host do cliente destino
+          message = client.host;
+          Sendto(client_udp_socket_number, message.c_str(), strlen(message.c_str()), 0, (struct sockaddr * ) &client_udp_socket, client_udp_socket_size);
+          message_sent = true;
+        }
+      }
+
+      if (!message_sent) {
+        message = "Falha ao enviar a mensagem: Cliente não encontrado!\n";
+        Sendto(client_udp_socket_number, message.c_str(), strlen(message.c_str()), 0, (struct sockaddr * ) &client_udp_socket, client_udp_socket_size);
+      }
     } else if (startsWith("exit", data_received)) {
       // handler para remover um cliente da lista
       int index = 0;

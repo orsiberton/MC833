@@ -8,6 +8,7 @@ int main(int argc, char **argv) {
   char data_received[MAXLINE];
   char client_name[INET_ADDRSTRLEN];
   vector<Client> client_list;
+  FILE *log_file;
 
   // cria um socket UDP
   client_udp_socket_number = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -28,8 +29,11 @@ int main(int argc, char **argv) {
     Recvfrom(client_udp_socket_number, data_received, sizeof(data_received), 0, (struct sockaddr * ) &client_udp_socket, &client_udp_socket_size);
 
     inet_ntop(AF_INET, &client_udp_socket.sin_addr.s_addr, client_name, sizeof(client_name));
-    printf("Cliente(%d/%s/%d): \n", client_udp_socket_number, client_name, ntohs(client_udp_socket.sin_port));
-    printf("%s\n", data_received);
+
+    // log as mensagens trafegadas pelos clientes
+    log_file = fopen("log_server.txt", "a+");
+    fprintf(log_file, "Cliente(%s/%d):\n\t%s\n", client_name, ntohs(client_udp_socket.sin_port), data_received);
+    fclose(log_file);
 
     // handler para conexão de novo cliente
     if (startsWith("connect-client", data_received)) {
@@ -44,6 +48,12 @@ int main(int argc, char **argv) {
       client.client_udp_socket = client_udp_socket;
       // adiciona cliente na lista
       client_list.push_back(client);
+
+      // log a conexão do cliente
+      log_file = fopen("log_server.txt", "a+");
+      fprintf(log_file, "Cliente se conectou:\n\tNickname: %s\n\tEndereço IP: %s\n\tPorta: %d\n", nickname_temp, client_name, ntohs(client_udp_socket.sin_port));
+      fclose(log_file);
+
     } else if (startsWith("list", data_received)) {
       // handler para listagem de clientes conectados
       string message = "Lista de clientes conectados:\n";
@@ -90,13 +100,10 @@ int main(int argc, char **argv) {
         Sendto(client_udp_socket_number, message.c_str(), strlen(message.c_str()), 0, (struct sockaddr * ) &client_udp_socket, client_udp_socket_size);
       }
     } else if (startsWith("transfer-file", data_received)) {
-      // TODO
       // handler para enviar IP e porta para o cliente, assim o cliente abrirá a conexão TCP
       char receiver_nickname[100];
       char file_name[MAXLINE];
       sscanf(data_received, "transfer-file %s %[^\t\n]", receiver_nickname, file_name);
-
-      printf("teste %s %s\n", receiver_nickname, file_name);
 
       string message = "open-connection-to-transfer-file ";
       message += file_name;
@@ -124,11 +131,13 @@ int main(int argc, char **argv) {
       // handler para remover um cliente da lista
       int index = 0;
       bool client_found = false;
+      string nickname;
       // faz a iteração sobre os clientes para saber qual será apagado da lista
       for(vector<Client>::iterator it = client_list.begin(); it != client_list.end(); ++it) {
         Client& client = *it;
         if (strcmp(client.host.c_str(), client_name) == 0 && client.port_number == ntohs(client_udp_socket.sin_port)) {
           client_found = true;
+          nickname = client.nickname;
           break;
         }
 
@@ -139,6 +148,11 @@ int main(int argc, char **argv) {
       if (client_found) {
         client_list.erase(client_list.begin() + index);
       }
+
+      // log a saída do cliente
+      log_file = fopen("log_server.txt", "a+");
+      fprintf(log_file, "Cliente se desconectou:\n\tNickname: %s\n\tEndereço IP: %s\n\tPorta: %d\n", nickname.c_str(), client_name, ntohs(client_udp_socket.sin_port));
+      fclose(log_file);
     } else {
       // Comando inválido
       string message = "Comando inválido!\n";

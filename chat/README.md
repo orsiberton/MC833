@@ -20,6 +20,7 @@ $ ./cliente <host do servidor>
 ```
 Assim que o cliente for executado, um texto explicativo será exibido para o cliente:
 
+```
 MC833 - Chat
 Instruções do chat:
  1) Para exibir a lista de usuários online: list
@@ -29,3 +30,4 @@ Instruções do chat:
  4) Para se desconectar do chat: exit
 
  Dessa forma o cliente não ficará perdido e saberá o que fazer.
+```
